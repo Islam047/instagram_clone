@@ -64,8 +64,7 @@ class AuthRepositoryImpl extends AuthRepository {
         return Right(user);
       } on ServerException {
         return Left(ServerFailure());
-      } catch(e) {
-        print(e);
+      } catch(_) {
         return Left(ServerFailure());
       }
     } else {
@@ -215,7 +214,7 @@ class AuthRepositoryImpl extends AuthRepository {
         await fireStore.followUser(user, someoneUser);
 
         // I am in someone`s followers
-        await fireStore.followUser(user, someoneUser);
+        await fireStore.followUser(someoneUser,user);
 
         await notificationData.pushNotification(notificationData.notificationParams(someone.device_token, user.fullName, someone.fullName));
         someoneUser.followed = true;
@@ -246,7 +245,7 @@ class AuthRepositoryImpl extends AuthRepository {
       try {
         String uid = localAuth.loadData(StorageKeys.UID);
 
-        // I un followed to someone
+        // I unfollowed  someone
         await fireStore.unFollowUser(uid, someone.uid);
 
         // I am not in someone`s followers

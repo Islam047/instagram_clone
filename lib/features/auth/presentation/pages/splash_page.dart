@@ -26,7 +26,7 @@ class _SplashPageState extends State<SplashPage> {
         if(snapshot.hasData) {
           return const HomePage();
         } else {
-          return const SignInPage();
+          return  SignInPage();
         }
       },
     );

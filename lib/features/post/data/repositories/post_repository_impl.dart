@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/core/datasources/cloud_storage_data_source.dart';
 import 'package:instagram_clone/core/error/exception.dart';
 import 'package:instagram_clone/core/error/failures.dart';
@@ -9,6 +10,7 @@ import 'package:instagram_clone/features/auth/data/datasources/fire_store_user_d
 import 'package:instagram_clone/features/auth/data/datasources/local_auth_data_source.dart';
 import 'package:instagram_clone/features/auth/data/models/user_model.dart';
 import 'package:instagram_clone/features/post/data/datasources/fire_store_post_data_source.dart';
+import 'package:instagram_clone/features/post/data/datasources/image_picker_data_source.dart';
 import 'package:instagram_clone/features/post/data/models/post_model.dart';
 import 'package:instagram_clone/features/post/domain/entities/post_entity.dart';
 import 'package:instagram_clone/features/post/domain/repositories/post_repository.dart';
@@ -19,6 +21,7 @@ class PostRepositoryImpl extends PostRepository {
   final CloudStorageDataSource cloudStorage;
   final FireStorePostDataSource fireStorePost;
   final FireStoreUserDataSource fireStoreUser;
+  final ImagePickerDataSource imagePickerDataSource;
 
   PostRepositoryImpl({
     required this.fireStorePost,
@@ -26,6 +29,7 @@ class PostRepositoryImpl extends PostRepository {
     required this.localAuth,
     required this.networkInfo,
     required this.fireStoreUser,
+    required this.imagePickerDataSource,
   });
 
   @override
@@ -165,4 +169,42 @@ class PostRepositoryImpl extends PostRepository {
       return Left(ConnectFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, File?>> getImageFromCamera() async{
+    if(await networkInfo.isConnected){
+      try {
+        XFile? image = await imagePickerDataSource.getImageFromCamera();
+        return Right(File(image!.path));
+      } on ServerException {
+        return Left(ServerFailure());
+      } on CacheException {
+        return Left(CacheFailure());
+      } catch(e) {
+        return Left(OtherFailure(e.toString()));
+      }
+    }else{
+      return Left(ConnectFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, File?>> getImageFromGallery()async {
+    if(await networkInfo.isConnected){
+      try {
+        XFile? image = await imagePickerDataSource.getImageFromGallery();
+        return Right(File(image!.path));
+      } on ServerException {
+        return Left(ServerFailure());
+      } on CacheException {
+        return Left(CacheFailure());
+      } catch(e) {
+        return Left(OtherFailure(e.toString()));
+      }
+    }else{
+      return Left(ConnectFailure());
+    }
+  }
+
+
 }

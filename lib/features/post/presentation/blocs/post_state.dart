@@ -1,85 +1,58 @@
 part of 'post_bloc.dart';
 
-abstract class PostState extends Equatable {
-  const PostState();
-}
+enum PostOverviewStatus { initial, loading, success, failure,done,image }
 
-class PostInitial extends PostState {
-  @override
-  List<Object> get props => [];
-}
-class PostLoading extends PostState {
-  @override
-  List<Object> get props => [];
-}
-class PostError extends PostState {
-  @override
-  List<Object> get props => [];
-}
-class LikePostStateSuccess extends PostState {
-  final Post post;
-  final bool liked;
+class PostOverviewState extends Equatable {
+  const PostOverviewState({
+    this.status = PostOverviewStatus.initial,
+    this.feeds = const [],
+    this.posts = const [],
+    this.likes = const [],
+    this.post,
+    this.liked,
+    this.image,
+    this.myImage,
+    this.caption,
+    this.page,
+  });
 
-  const LikePostStateSuccess({required this.post, required this.liked});
+  final PostOverviewStatus status;
+  final List<Post>? feeds;
+  final List<Post>? posts;
+  final List<Post>? likes;
+  final Post? post;
+  final bool? liked;
+  final File? image;
+  final File? myImage;
+  final String? caption;
+  final int? page;
 
-  @override
-  List<Object> get props => [post, liked];
-}
-
-class LoadFeedsStateSuccess extends PostState {
-  final List<Post> feeds;
-
-  const LoadFeedsStateSuccess({required this.feeds});
-
-  @override
-  List<Object> get props => [feeds];
-}
-class LoadLikesStateSuccess extends PostState {
-  final List<Post> likes;
-  const LoadLikesStateSuccess({required this.likes});
-
-  @override
-  List<Object> get props => [likes];
-}
-class LoadPostsStateSuccess extends PostState {
-  final List<Post> posts;
-
-  const LoadPostsStateSuccess({required this.posts});
-
-  @override
-  List<Object> get props => [];
-}
-class RemovePostStateSuccess extends PostState {
-  final Post post;
-
-  const RemovePostStateSuccess({required this.post});
-
-  @override
-  List<Object> get props => [post];
-}
-
-class StorePostStateSuccess extends PostState {
-  final File image;
-  final String caption;
-  const StorePostStateSuccess({required this.image,required this.caption});
+  PostOverviewState copyWith({
+    PostOverviewStatus Function()? status,
+    List<Post> Function()? feeds,
+    List<Post> Function()? posts,
+    List<Post> Function()? likes,
+    Post Function()? post,
+    bool? Function()? liked,
+    File? Function()? image,
+    File? Function()? myImage,
+    String? Function()? caption,
+    int? Function()? page,
+  }) {
+    return PostOverviewState(
+      status: status != null ? status() : this.status,
+      feeds: feeds != null ? feeds() : this.feeds,
+      posts: posts != null ? posts() : this.posts,
+      likes: likes != null ? likes() : this.likes,
+      post: post != null ? post() : this.post,
+      liked: liked != null ? liked() : this.liked,
+      image: image != null ? image() : this.image,
+      myImage: myImage != null ? myImage() : this.myImage,
+      caption: caption != null ? caption() : this.caption,
+      page: page != null ? page() : this.page,
+    );
+  }
 
   @override
-  List<Object?> get props => [image,caption];
+  List<Object?> get props => [status, feeds, posts, likes, post, liked, image, caption, page,myImage];
 }
-
-class GetImageStateSuccess extends PostState {
-  final File image;
-  const GetImageStateSuccess({required this.image});
-
-  @override
-  List<Object?> get props => [image];
-}
-
-class NavigatePageState extends PostState {
-  final int page;
-  const NavigatePageState({required this.page});
-
-  @override
-  List<Object?> get props => [page];
-}
-

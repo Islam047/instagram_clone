@@ -45,9 +45,10 @@ class DeleteUserEvent extends AuthEvent {
 }
 
 class FollowUserEvent extends AuthEvent {
+  final BuildContext context;
   final User user;
 
-  const FollowUserEvent({required this.user});
+  const FollowUserEvent({required this.user,required this.context});
 
   @override
   List<Object> get props => [user];
@@ -69,8 +70,9 @@ class SearchUsersEvent extends AuthEvent {
 
 class UnfollowUserEvent extends AuthEvent {
   final User user;
+  final BuildContext context;
 
-  const UnfollowUserEvent({required this.user});
+  const UnfollowUserEvent({required this.user,required this.context});
 
   @override
   List<Object> get props => [user];

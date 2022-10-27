@@ -5,22 +5,18 @@ import 'package:instagram_clone/core/service/service_locator.dart';
 import 'package:instagram_clone/core/util/utility.dart';
 import 'package:instagram_clone/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:instagram_clone/features/auth/presentation/pages/signin_page.dart';
+import 'package:instagram_clone/features/auth/presentation/pages/views/sign_up_view.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+class SignUpPage extends StatelessWidget {
+  SignUpPage({Key? key}) : super(key: key);
   static const String id = "signup_page";
 
-  @override
-  State<SignUpPage> createState() => _SignUpPageState();
-}
-
-class _SignUpPageState extends State<SignUpPage> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController fullNameController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
-
-  AuthBloc bloc = locator<AuthBloc>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final AuthBloc bloc = locator<AuthBloc>();
 
   @override
   Widget build(BuildContext context) {
@@ -60,45 +56,42 @@ class _SignUpPageState extends State<SignUpPage> {
                                 fontSize: 45,
                                 fontFamily: "Billabong"),
                           ),
-                          const SizedBox(
-                            height: 20,
-                          ),
+                          const SizedBox(height: 20),
 
                           // #fullname
-                          textField(
+                          TextFieldSignUp(
                               hintText: "FullName",
                               controller: fullNameController),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           // #email
-                          textField(
+                          TextFieldSignUp(
                               hintText: "Email", controller: emailController),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           // #password
-                          textField(
+                          TextFieldSignUp(
                               hintText: "Password",
                               controller: passwordController),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           // #password
-                          textField(
+                          TextFieldSignUp(
                               hintText: "Confirm Password",
                               controller: confirmPasswordController),
-                          const SizedBox(
-                            height: 10,
-                          ),
+                          const SizedBox(height: 10),
 
                           // #signin
-                          button(title: "Sign Up", onPressed: () {
-                            bloc.add(SignUpUserEvent(fullName: fullNameController.text, email: emailController.text, password: passwordController.text, confirmPassword: confirmPasswordController.text));
-                          }),
+                          ButtonSignUp(
+                              title: "Sign Up",
+                              onPressed: () {
+                                bloc.add(SignUpUserEvent(
+                                    fullName: fullNameController.text,
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                    confirmPassword:
+                                        confirmPasswordController.text));
+                              }),
                         ],
                       ),
                     ),
@@ -123,16 +116,18 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
             ),
-
-            BlocConsumer<AuthBloc, AuthState>(
+            BlocConsumer<AuthBloc, AuthOverviewState>(
               listener: (context, state) {
-                if(state is SignUpSuccessState) {
+                if (state.status == AuthOverviewStatus.success) {
                   Utils.fireSnackBar("Successfully Sign Up", context);
                   Navigator.pushNamed(context, SignInPage.id);
                 }
+                if(state.status == AuthOverviewStatus.failure){
+                  Utils.fireSnackBar(state.error!, context);
+                }
               },
               builder: (context, state) {
-                if(state is AuthLoading) {
+                if (state.status == AuthOverviewStatus.loading) {
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
@@ -142,46 +137,6 @@ class _SignUpPageState extends State<SignUpPage> {
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  ClipRRect textField(
-      {required String hintText,
-      bool? isHidden,
-      required TextEditingController controller}) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(7.5),
-      child: TextField(
-        style: const TextStyle(fontSize: 16, color: Colors.white),
-        controller: controller,
-        obscureText: isHidden ?? false,
-        decoration: InputDecoration(
-            border: InputBorder.none,
-            filled: true,
-            fillColor: Colors.white54.withOpacity(0.2),
-            hintText: hintText,
-            hintStyle: const TextStyle(color: Colors.white54)),
-      ),
-    );
-  }
-
-  MaterialButton button(
-      {required String title, required void Function() onPressed}) {
-    return MaterialButton(
-      onPressed: onPressed,
-      height: 50,
-      minWidth: double.infinity,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(7.5),
-        side: BorderSide(color: Colors.white54.withOpacity(0.2), width: 2),
-      ),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.white,
         ),
       ),
     );

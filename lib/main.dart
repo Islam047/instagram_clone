@@ -21,7 +21,6 @@ void main() async {
   var initIosSetting = const DarwinInitializationSettings();
   var initSetting = InitializationSettings(android: initAndroidSetting, iOS: initIosSetting);
   await FlutterLocalNotificationsPlugin().initialize(initSetting);
-
   Bloc.observer = SimpleBlocObserver();
 
   runApp(const MyApp());
@@ -45,8 +44,8 @@ class MyApp extends StatelessWidget {
       home: const SplashPage(),
       routes: {
         SplashPage.id: (context) => const SplashPage(),
-        SignInPage.id: (context) => const SignInPage(),
-        SignUpPage.id: (context) => const SignUpPage(),
+        SignInPage.id: (context) =>  SignInPage(),
+        SignUpPage.id: (context) =>  SignUpPage(),
         HomePage.id: (context) => const HomePage(),
       },
     );

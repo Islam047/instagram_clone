@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dartz/dartz.dart';
 import 'package:instagram_clone/core/error/failures.dart';
 import 'package:instagram_clone/features/post/domain/entities/post_entity.dart';
@@ -11,4 +10,6 @@ abstract class PostRepository {
   Future<Either<Failure, List<Post>>> loadLikes();
   Future<Either<Failure, Post>> likePost(Post post, bool liked);
   Future<Either<Failure, void>> removePost(Post post);
+  Future<Either<Failure, File?>> getImageFromCamera();
+  Future<Either<Failure, File?>> getImageFromGallery();
 }

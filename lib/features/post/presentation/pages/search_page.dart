@@ -1,174 +1,103 @@
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:instagram_clone/features/auth/domain/entities/user_entity.dart';
 import 'package:instagram_clone/features/auth/presentation/blocs/auth_bloc.dart';
+import 'package:instagram_clone/features/post/presentation/pages/views/search_user_view.dart';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends StatelessWidget {
   const SearchPage({Key? key}) : super(key: key);
 
-  @override
-  State<SearchPage> createState() => _SearchPageState();
-}
-
-class _SearchPageState extends State<SearchPage> {
-  TextEditingController controller = TextEditingController();
-  List<User> user = [];
-
-  late AuthBloc authBloc;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    authBloc = BlocProvider.of<AuthBloc>(context)
-      ..add(const SearchUsersEvent(keyword: ""));
-  }
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if(state is SearchUsersSuccessState) {
-          setState(() {
-            user = state.users;
-          });
-        }
-
-        if(state is FollowUserSuccessState) {
-          authBloc.add(const SearchUsersEvent(keyword: ""));
-        }
-
-        if(state is UnfollowUserSuccessState) {
-          authBloc.add(const SearchUsersEvent(keyword: ""));
-        }
-      },
-      builder: (context, state) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            title: const Text(
-              "Search",
-              style: TextStyle(
-                  color: Colors.black, fontFamily: "Billabong", fontSize: 30),
-            ),
-          ),
-          body: Stack(
+    // AuthBloc authBloc = BlocProvider.of<AuthBloc>(context)..add(const SearchUsersEvent(keyword: ""));
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text(
+          "Search",
+          style: TextStyle(
+              color: Colors.black, fontFamily: "Billabong", fontSize: 30),
+        ),
+      ),
+      body: Stack(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // #search
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 20.0),
-                    child: TextField(
-                      controller: controller,
-                      onChanged: (keyword) {
-                        authBloc.add(SearchUsersEvent(keyword: keyword));
-                      },
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          filled: true,
-                          fillColor: Colors.grey.shade200,
-                          border: InputBorder.none,
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            color: Colors.grey,
-                          ),
-                          hintText: "Search",
-                          hintStyle: TextStyle(color: Colors.grey)),
-                    ),
-                  ),
-
-                  // #users
-                  Expanded(
-                    child: ListView.builder(
-                      itemCount: user.length,
-                      itemBuilder: (context, index) => itemOfUser(user[index]),
-                    ),
-                  )
-                ],
+              // #search
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 5.0, horizontal: 20.0),
+                child: TextField(
+                  onChanged: (keyword) {
+                    context.read<AuthBloc>().add(SearchUsersEvent(keyword: keyword));
+                  },
+                  decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 10),
+                      filled: true,
+                      fillColor: Colors.grey.shade200,
+                      border: InputBorder.none,
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: Colors.grey,
+                      ),
+                      hintText: "Search",
+                      hintStyle: const TextStyle(color: Colors.grey)),
+                ),
               ),
-              if (state is AuthLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                )
+
+              // #users
+              Expanded(
+                child: BlocConsumer<AuthBloc, AuthOverviewState>(
+                  listener: (context,state){
+                    if(state.status == AuthOverviewStatus.following){
+                      context.read<AuthBloc>().add(const SearchUsersEvent(keyword: ''));
+                    }
+
+                  },
+                  builder: (context, state) {
+                    return ListView.builder(
+                        itemCount: state.users?.length,
+                        itemBuilder: (context, index) {
+                          if (state.users?.length != null) {
+                            return ItemOfUser(user: state.users![index]);
+                          } else {
+                            return const SizedBox.shrink();
+                          }
+                        }
+
+                    );
+                  },
+                ),
+              )
             ],
           ),
-        );
-      },
-    );
-  }
-
-  Widget itemOfUser(User user) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ListTile(
-        leading: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              border: Border.all(color: Colors.purpleAccent, width: 2)),
-          padding: const EdgeInsets.all(2),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(25),
-            child: user.imageUrl != null
-                ? CachedNetworkImage(
-                    height: 40,
-                    width: 40,
-                    fit: BoxFit.cover,
-                    imageUrl: user.imageUrl!,
-                    placeholder: (context, url) => const Image(
-                        image: AssetImage("assets/images/user.png")),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
-                  )
-                : const Image(
-                    image: AssetImage("assets/images/user.png"),
-                    height: 40,
-                    width: 40,
-                  ),
-          ),
-        ),
-        title: Text(
-          user.fullName,
-          style:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-        ),
-        subtitle: Text(user.email,
-            style: const TextStyle(
-              color: Colors.black54,
-            )),
-        trailing: Container(
-          height: 30,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: MaterialButton(
-            onPressed: () {
-              if(user.followed) {
-                authBloc.add(UnfollowUserEvent(user: user));
+          BlocBuilder<AuthBloc, AuthOverviewState>(
+            builder: (context, state) {
+              if (state.status == AuthOverviewStatus.loading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
               } else {
-                authBloc.add(FollowUserEvent(user: user));
+                return const SizedBox.shrink();
               }
             },
-            child: Text(
-              user.followed ? "Following" : "Follow",
-              style: const TextStyle(
-                color: Colors.black87,
-              ),
-            ),
-          ),
-        ),
+          )
+        ],
       ),
     );
   }
+
+
 }

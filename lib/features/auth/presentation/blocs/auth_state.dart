@@ -1,81 +1,34 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
-  const AuthState();
-}
+enum AuthOverviewStatus { initial, loading, success, failure,following,signOut }
 
-class AuthInitial extends AuthState {
-  @override
-  List<Object> get props => [];
-}
+class AuthOverviewState extends Equatable {
+  const AuthOverviewState({
+    this.status = AuthOverviewStatus.initial,
+    this.users = const [],
+    this.user,
+    this.error,
+  });
 
-class AuthLoading extends AuthState {
-  @override
-  List<Object> get props => [];
-}
+  final AuthOverviewStatus status;
+  final String? error;
+  final User? user;
+  final List<User>? users;
 
-class AuthError extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class SignInSuccessState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class SignUpSuccessState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class SignOutSuccessState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class DeleteUserSuccessState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class FollowUserSuccessState extends AuthState {
-
-  final User user;
-  const FollowUserSuccessState({required this.user});
+  AuthOverviewState copyWith({
+    AuthOverviewStatus Function()? status,
+    List<User> Function()? users,
+    User Function()? user,
+    String? Function()? error,
+  }) {
+    return AuthOverviewState(
+      status: status != null ? status() : this.status,
+      users: users != null ? users() : this.users,
+      user: user != null ? user() : this.user,
+      error: error != null ? error() : this.error,
+    );
+  }
 
   @override
-  List<Object> get props => [user];
-}
-
-class LoadUserSuccessState extends AuthState {
-  final User user;
-  const LoadUserSuccessState({required this.user});
-
-  @override
-  List<Object> get props => [user];
-}
-
-class SearchUsersSuccessState extends AuthState {
-  final List<User> users;
-  const SearchUsersSuccessState({required this.users});
-
-  @override
-  List<Object> get props => [users];
-}
-
-class UnfollowUserSuccessState extends AuthState {
-  final User user;
-  const UnfollowUserSuccessState({required this.user});
-
-  @override
-  List<Object> get props => [user];
-}
-
-class UpdateUserPhotoSuccessState extends AuthState {
-  final User user;
-  const UpdateUserPhotoSuccessState({required this.user});
-
-  @override
-  List<Object> get props => [user];
+  List<Object?> get props => [status, users, user, error];
 }

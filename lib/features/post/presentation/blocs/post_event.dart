@@ -69,3 +69,15 @@ class NavigatePageEvent extends PostEvent {
   @override
   List<Object> get props => [page];
 }
+class GetImageFromCameraEvent extends PostEvent {
+
+  const GetImageFromCameraEvent();
+
+  @override
+  List<Object> get props => [];
+}
+class GetImageFromGalleryEvent extends PostEvent {
+  const GetImageFromGalleryEvent();
+  @override
+  List<Object> get props => [];
+}

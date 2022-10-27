@@ -6,10 +6,11 @@ import 'package:instagram_clone/core/service/service_locator.dart';
 import 'package:instagram_clone/core/util/utility.dart';
 import 'package:instagram_clone/features/auth/presentation/blocs/auth_bloc.dart';
 import 'package:instagram_clone/features/post/presentation/blocs/post_bloc.dart';
+import 'package:instagram_clone/features/post/presentation/pages/profile_page.dart';
+import 'package:instagram_clone/features/post/presentation/pages/search_page.dart';
 import 'feed_page.dart';
 import 'likes_page.dart';
-import 'profile_page.dart';
-import 'search_page.dart';
+
 import 'upload_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,7 +31,6 @@ class _HomePageState extends State<HomePage> {
 
   _initNotification() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Message: ${message.notification.toString()}");
       Utils.showLocalNotification(message);
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           create: (context) => authBloc,
         ),
         BlocProvider (
-          create: (context) => postBloc,
+          create: (context) => postBloc..add(const LoadFeedsEvent()),
         ),
       ],
       child: Scaffold(

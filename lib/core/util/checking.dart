@@ -5,13 +5,13 @@ class Checking {
   static Either<Failure, bool> emailChecking(String email) {
     String format = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regExp = RegExp(format);
-    bool result = regExp.hasMatch(email);
+    bool result = regExp.hasMatch(email.trim());
     if (result) return Right(result);
     return Left(InvalidEmailFailure());
   }
 
   static Either<Failure, bool> nameChecking(String name) {
-    bool result = name.length > 3;
+    bool result = name.trim().length > 3;
 
     if (result) return Right(result);
     return Left(InvalidEmailFailure());
@@ -22,11 +22,11 @@ class Checking {
       return Left(EmptyFieldFailure());
     }
 
-    bool hasUppercase = password.contains(RegExp(r'[A-Z]'));
-    bool hasDigits = password.contains(RegExp(r'[0-9]'));
-    bool hasLowercase = password.contains(RegExp(r'[a-z]'));
-    bool hasSpecialCharacters = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-    bool hasMinLength = password.length > minLength;
+    bool hasUppercase = password.trim().contains(RegExp(r'[A-Z]'));
+    bool hasDigits = password.trim().contains(RegExp(r'[0-9]'));
+    bool hasLowercase = password.trim().contains(RegExp(r'[a-z]'));
+    bool hasSpecialCharacters = password.trim().contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    bool hasMinLength = password.trim().length > minLength;
 
     bool result = hasDigits & hasUppercase & hasLowercase & hasSpecialCharacters & hasMinLength;
     if (result) return Right(result);
